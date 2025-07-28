@@ -1,623 +1,665 @@
-## Verifiable Credentials - w3c
-
-  
-# nebuia
+# Verifiable Credentials - W3C Standard Implementation
 
 [![N|Nebula](https://i.ibb.co/DC46xJv/banner-min.png)](https://nebuia.com)
 
-Bibliografias
+## 🚀 Overview
 
-Reusable Verifiable Claims using [EIP 712 Signed Typed Data](https://eips.ethereum.org/EIPS/eip-712).
+This project implements Verifiable Credentials using the [W3C VC specification](https://www.w3.org/TR/vc-data-model/#abstract) with blockchain technology. It provides a complete framework for creating, managing, and verifying digital credentials on Ethereum-compatible networks using [EIP-712 Signed Typed Data](https://eips.ethereum.org/EIPS/eip-712).
 
-## Abstract
+## 🎯 Key Features
 
-El presente trabajo propone la implementación de credenciales verificables usando el estándar propuesto [VC specification](https://www.w3.org/TR/vc-data-model/#abstract) publicado por W3C Credentials Community Group.
+- **W3C Compliant**: Full implementation of Verifiable Credentials specification
+- **EIP-712 Signatures**: Secure, structured data signing
+- **Modular Architecture**: Easy to extend with custom credential types
+- **Gas Optimized**: Using Zero-Copy serialization for efficient storage
+- **Hardhat Integration**: Complete development environment with testing suite
+- **Multiple Credential Types**: Includes examples for NebuIA (identity), Alumni, Document Multi-sign, and **NEW: Intellectual Property (IPPBlock)**
 
-  
+## 🏗️ Architecture
 
-Este es un estándar para la verificación agnóstica de credenciales bajo el estándar EIP712 e incluye:
-
--  **Serialización** y **Deserialización** de estructuras (Claims)
-
-- Verificación de **EIP712**
-
-- Metadata basado en [VC specification](https://www.w3.org/TR/vc-data-model/#abstract)
-
-- Conexión de contrato verificador a implementaciones personalizadas implementado metadata [VC specification](https://www.w3.org/TR/vc-data-model/#abstract).
-
-- Creación/ revocación de credenciales verificables
-
-  
-
-## Motivación
-
-  
-
-EIP 712
-
-  
-
-> La firma de datos es un problema resuelto si lo único que nos importa son las cadenas de bytes. Desafortunadamente, en el mundo real nos preocupamos por los mensajes complejos y significativos. Hashing de datos estructurados no es trivial y los errores dan como resultado la pérdida de las propiedades de seguridad del sistema. Como tal, se aplica el adagio "no hagas tu propia criptografía". En su lugar, se debe utilizar un método estándar bien probado y revisado por pares. Este EIP pretende ser ese estándar. Este EIP tiene como objetivo mejorar la usabilidad de la firma de mensajes fuera de la cadena para su uso en la cadena. Estamos viendo una adopción creciente de la firma de mensajes fuera de la cadena, ya que ahorra gasolina y reduce la cantidad de transacciones en la cadena de bloques. Los mensajes actualmente firmados son una cadena hexadecimal opaca que se muestra al usuario con poco contexto sobre los elementos que componen el mensaje.
-
-  
-
-EIP 1812
-
-> Los reclamos verificables fuera de la cadena reutilizables brindan una parte importante de la integración de contratos inteligentes con los requisitos organizacionales del mundo real, como cumplir con los requisitos regulatorios como KYC, GDPR, reglas de inversores acreditados, etc. ERC-735 y ERC-780 proporcionan métodos para hacer afirmaciones que viven en cadena. Esto es útil para algunos casos de uso particulares, donde alguna afirmación sobre una dirección debe verificarse en cadena. Sin embargo, en la mayoría de los casos es peligroso y, en algunos casos, ilegal (según las normas del RGPD de la UE, por ejemplo) registrar reclamos de identidad que contengan información de identificación personal (PII) en una base de datos pública inmutable como la cadena de bloques Ethereum. Las representaciones y el modelo de datos de credenciales verificables de W3C, así como las especificaciones de mensajes de verificación de uPort, son soluciones fuera de la cadena propuestas. Si bien se basan en estándares de la industria como JSON-LD y JWT, ninguno de ellos es fácil de integrar con el ecosistema Ethereum. EIP-712 presenta un nuevo método para firmar datos de identidad de cadena. Esto proporciona un formato de datos basado en la codificación Solidity ABI que se puede analizar fácilmente en la cadena y una nueva llamada JSON-RPC que es fácilmente compatible con las billeteras Ethereum existentes y los clientes Web3. Este formato permite que los reclamos verificables reutilizables fuera de la cadena se emitan de manera económica a los usuarios, quienes pueden presentarlos cuando sea necesario.
-
-  
-
-La creación de estructuras de datos verificables resulta un problema cuando cada institución o individuo decide crear tipos diferentes de datos, provocando esto la no estandarización de consumo de información. Este trabajo tiene como objetivo la creación de un contrato verificador y estándar ó funciones mínimas para la verificación / consulta y operación de datos asignados a un usuario, de ahi la adopción credenciales verificables.
-
-  
-
-## Conformance and Terminology
-
-  
-
-Esta especificación supone un buen grado de comprensión de [W3C VCs Data Model]https://www.w3.org/TR/vc-data-model).
-
-  
-  
-
-The key words "MUST", "MUST NOT", "SHOULD", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [IETF RFC 2119](https://www.ietf.org/rfc/rfc2119).
-
-  
-
-## Especifiación
-
-  
-
-Credencial (claims)
-
-Los claimsse pueden generalizar así:
-
-  
-
-> El Emisor afirma que el Sujeto es algo o tiene algún atributo y valor.
-
-> Las reclamaciones deben ser deterministas, en el sentido de que la
-
-> misma reclamación debe estar firmada varias veces por el mismo
-
-> firmante.
-
-  
-
-Ejemplo de claim (Credencial Universitaria)
-
-  
-
-```js
-
-// sample claim
-
- // sample claim
-    struct University {
-        string value; // university name
-        string[] subjects; // subjects of student in university
-    }
-
-    // Credential subject - can be named differently
-    struct AlumniOf {
-        string id; // identifier about the only subject of the credential
-        // assertion about the only subject of the credential
-        // TODO - Define credential structure
-        University[] universities;
-    }
+```
+verifiable_credential_WEB3/
+├── contracts/
+│   ├── EIP/               # EIP-712 interfaces
+│   ├── libs/              # Zero-Copy serialization libraries
+│   ├── utils/             # Utility contracts (Ownable)
+│   ├── sample/            # Sample credential implementations
+│   │   ├── AlumniOf.sol
+│   │   ├── DocumentMultiSign.sol
+│   │   ├── NebuIA.sol
+│   │   └── IntellectualProperty.sol  # NEW: IPPBlock implementation
+│   └── VC.sol             # Main Verifiable Credentials manager
+├── test/                  # Test suites
+├── scripts/               # Deployment scripts
+└── hardhat.config.js      # Hardhat configuration
 ```
 
-  
+## 🛠️ Technical Stack
 
-Cada emisor quiere usar su propia estructura de datos, y permitir que esta sea verificable y presentada ante otras implementaciones de forma natural, es por eso que cada estructura de datos debe ser serializada para su uso en bytes desde contratos inteligentes ajenos.
+- **Solidity ^0.8.20**: Smart contract language
+- **Hardhat**: Development environment
+- **Ethers.js v6**: Ethereum library
+- **EIP-712**: Typed structured data hashing and signing
+- **Zero-Copy Serialization**: Efficient data encoding/decoding
 
-  
+## 📦 Installation
 
-```js
-function serializeAlumniOf(AlumniOf memory alumn)
-        public
-        pure
-        returns (bytes memory)
-    {
-        bytes memory idBytes = ZeroCopySink.WriteVarBytes(bytes(alumn.id));
+```bash
+# Clone the repository
+git clone https://github.com/your-repo/verifiable_credential_WEB3.git
+cd verifiable_credential_WEB3
 
-        // serialize list of universities
-        bytes memory universitiesLenBytes = ZeroCopySink.WriteUint255(
-            alumn.universities.length
-        );
-        bytes memory universitiesBytes = new bytes(0);
-        for (uint256 i = 0; i < alumn.universities.length; i++) {
-            bytes memory valueBytes;
-            bytes memory subjectsLenBytes;
-            bytes memory subjectsBytes;
-            (valueBytes, subjectsLenBytes, subjectsBytes) = serializeUniversity(
-                alumn.universities[i]
-            );
+# Install dependencies
+npm install
 
-            bytes memory result = abi.encodePacked(
-                valueBytes,
-                subjectsLenBytes,
-                subjectsBytes
-            );
+# Create environment file
+cp .env.example .env
+# Edit .env with your configuration
 
-            universitiesBytes = abi.encodePacked(universitiesBytes, result);
-        }
-
-        return
-            abi.encodePacked(idBytes, universitiesLenBytes, universitiesBytes);
-    }
-
-    function deserializeAlumniOf(bytes memory data)
-        public
-        pure
-        returns (AlumniOf memory)
-    {
-        (bytes memory idData, uint256 offset) = ZeroCopySource.NextVarBytes(
-            data,
-            0
-        );
-
-        uint256 universitiesLen;
-        (universitiesLen, offset) = ZeroCopySource.NextUint255(data, offset);
-        University[] memory universities = new University[](universitiesLen);
-
-        for (uint256 i = 0; i < universitiesLen; i++) {
-            University memory university;
-            (university, offset) = deserializeUniversity(data, offset);
-            universities[i] = university;
-        }
-
-        return AlumniOf(string(idData), universities);
-    }
-
-    function serializeUniversity(University memory university)
-        private
-        pure
-        returns (
-            bytes memory,
-            bytes memory,
-            bytes memory
-        )
-    {
-        bytes memory valueBytes = ZeroCopySink.WriteVarBytes(
-            bytes(university.value)
-        );
-        // serialize list string
-        bytes memory subjectsLenBytes = ZeroCopySink.WriteUint255(
-            university.subjects.length
-        );
-        bytes memory subjectsBytes = new bytes(0);
-        for (uint256 i = 0; i < university.subjects.length; i++) {
-            subjectsBytes = abi.encodePacked(
-                subjectsBytes,
-                ZeroCopySink.WriteVarBytes(bytes(university.subjects[i]))
-            );
-        }
-
-        return (valueBytes, subjectsLenBytes, subjectsBytes);
-    }
-
-    function deserializeUniversity(bytes memory data, uint256 offset)
-        private
-        pure
-        returns (University memory, uint256)
-    {
-        bytes memory value;
-        (value, offset) = ZeroCopySource.NextVarBytes(data, offset);
-
-        uint256 subjectsLen;
-        (subjectsLen, offset) = ZeroCopySource.NextUint255(data, offset);
-        string[] memory subjects = new string[](subjectsLen);
-
-        for (uint256 i = 0; i < subjectsLen; i++) {
-            bytes memory ctrl;
-            (ctrl, offset) = ZeroCopySource.NextVarBytes(data, offset);
-            subjects[i] = string(ctrl);
-        }
-
-        return (University(string(value), subjects), offset);
-    }
+# IMPORTANT: Add your RPC URLs for the networks you plan to use
 ```
-  
 
-## Estructura propuesta
+## 🔧 Configuration
 
-IEIP712
+### Environment Variables
 
-```js
-interface IEIP721 {
+Create a `.env` file in the root directory (copy from `.env.example`):
 
-    struct Schema {
-        string id;
-        string typeSchema;
+```bash
+# Private key for deployment and testing
+PRIVATE_KEY=0x... # Your private key (with 0x prefix)
+
+# Network RPC URLs
+SEPOLIA_RPC_URL=https://sepolia.infura.io/v3/YOUR-PROJECT-ID
+MUMBAI_RPC_URL=https://polygon-mumbai.infura.io/v3/YOUR-PROJECT-ID
+POLYGON_RPC_URL=https://polygon-rpc.com
+MAINNET_RPC_URL=https://mainnet.infura.io/v3/YOUR-PROJECT-ID
+
+# Block explorer API keys (for contract verification)
+ETHERSCAN_API_KEY=YOUR-ETHERSCAN-API-KEY
+POLYGONSCAN_API_KEY=YOUR-POLYGONSCAN-API-KEY
+```
+
+### Network Configuration
+
+Available networks in `hardhat.config.js`:
+
+**Local Networks:**
+- `hardhat` - Local development network
+
+**Mainnets:**
+- `ethereum` - Ethereum Mainnet (Chain ID: 1)
+- `ethereumClassic` - Ethereum Classic (Chain ID: 61)
+- `bnb` - BNB Smart Chain (Chain ID: 56)
+- `polygon` - Polygon (Chain ID: 137)
+
+**Testnets:**
+- `ethereumSepolia` - Ethereum Sepolia (Chain ID: 11155111)
+- `ethereumClassicMordor` - ETC Mordor (Chain ID: 63)
+- `bnbTestnet` - BNB Testnet (Chain ID: 97)
+- `polygonMumbai` - Polygon Mumbai (Chain ID: 80001)
+
+## ⚙️ Hardhat Configuration
+
+The project uses a custom Hardhat configuration optimized for complex contracts:
+
+```javascript
+module.exports = {
+  solidity: {
+    version: "0.8.20",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 100,
+      },
+      viaIR: true,  // IMPORTANT: Enables IR-based compilation to avoid stack too deep errors
+    },
+  },
+  networks: {
+    hardhat: {
+      chainId: 1337,
+      accounts: [
+        {
+          privateKey: "0x027c30c1fc5d27479a934406c74d971636ac93df159a8553dc5875068bfee3d4",
+          balance: "10000000000000000000000"
+        }
+      ]
+    },
+    // Additional networks: sepolia, mumbai, polygon, mainnet
+  }
+};
+```
+
+## 🛠️ Compilation
+
+```bash
+# Clean previous builds
+npx hardhat clean
+
+# Compile all contracts
+npx hardhat compile
+
+# Force recompilation
+npx hardhat compile --force
+```
+
+### Compilation Notes
+- Uses Solidity 0.8.20 with optimizer enabled
+- `viaIR: true` prevents "stack too deep" errors for complex contracts
+- Artifacts are generated in `./artifacts` directory
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+npx hardhat test
+
+# Run specific test suite
+npx hardhat test test/IPPBlock.test.js
+
+# Run tests with gas reporting
+REPORT_GAS=true npx hardhat test
+
+# Run tests with coverage
+npx hardhat coverage
+
+# Run tests on a specific network
+npx hardhat test --network sepolia
+```
+
+### Test Suites Available
+- `test/IPPBlock.test.js` - Intellectual Property credential tests
+- `test/nebuia.js` - NebuIA identity credential tests
+- Additional test files for other credential types
+
+## 🚀 Deployment
+
+### Local Deployment
+
+```bash
+# Start local Hardhat node
+npx hardhat node
+
+# In another terminal, deploy to local network
+npx hardhat run scripts/deploy-ippblock.js --network localhost
+```
+
+### Testnet Deployment
+
+```bash
+# Deploy to Ethereum Sepolia
+npx hardhat run scripts/deploy-ippblock.js --network ethereumSepolia
+
+# Deploy to Polygon Mumbai
+npx hardhat run scripts/deploy-ippblock.js --network polygonMumbai
+
+# Deploy to BNB Testnet
+npx hardhat run scripts/deploy-ippblock.js --network bnbTestnet
+
+# Deploy to Ethereum Classic Mordor
+npx hardhat run scripts/deploy-ippblock.js --network ethereumClassicMordor
+```
+
+### Mainnet Deployment
+
+```bash
+# Deploy to Ethereum (use with caution!)
+npx hardhat run scripts/deploy-ippblock.js --network ethereum
+
+# Deploy to Polygon
+npx hardhat run scripts/deploy-ippblock.js --network polygon
+
+# Deploy to BNB Smart Chain
+npx hardhat run scripts/deploy-ippblock.js --network bnb
+
+# Deploy to Ethereum Classic
+npx hardhat run scripts/deploy-ippblock.js --network ethereumClassic
+```
+
+### Deployment Scripts
+
+1. **`deploy-ippblock.js`** - Deploys only IPPBlock and NebuVC contracts
+   ```bash
+   npx hardhat run scripts/deploy-ippblock.js --network <network>
+   ```
+
+2. **`deploy-all.js`** - Deploys all contracts (NebuVC, NebuIA, AlumniOf, DocumentMultiSign, IPPBlock)
+   ```bash
+   npx hardhat run scripts/deploy-all.js --network <network>
+   ```
+
+### Post-Deployment
+
+After deployment, the scripts will:
+- Display all deployed contract addresses
+- Save deployment data to `./deployments/<network>-deployment.json`
+- Test basic functionality of deployed contracts
+
+### Contract Verification
+
+After deployment, verify contracts on Etherscan:
+
+```bash
+# Verify IPPBlockVC
+npx hardhat verify --network sepolia <IPPBLOCK_ADDRESS> \
+  "https://ippblock.io/issuers/001" \
+  '["https://www.w3.org/2018/credentials/v1","https://ippblock.io/credentials/v1"]' \
+  "https://ippblock.io/credentials/ip/1" \
+  '["VerifiableCredential","IntellectualPropertyCredential"]' \
+  "https://ippblock.io/issuers/001#key-1" \
+  '{"id":"https://ippblock.io/schemas/intellectual-property.json","typeSchema":"JsonSchemaValidator2018"}' \
+  "QmIPPBlockLogoHash123456789"
+
+# Verify NebuVC (no constructor arguments)
+npx hardhat verify --network sepolia <NEBUVC_ADDRESS>
+```
+
+## 📄 Smart Contracts
+
+### VC.sol - Main Verifiable Credentials Manager
+- Creates and stores verifiable credentials
+- Verifies signatures and credentials
+- Manages credential lifecycle (issuance, revocation)
+- Supports multiple credential types
+
+### Sample Implementations
+
+#### 1. **NebuIA.sol** - Digital Identity
+- Personal identity verification
+- Multiple verification methods (email, phone, address, document, biometric)
+
+#### 2. **AlumniOf.sol** - Educational Credentials
+- University affiliations
+- Subject certifications
+
+#### 3. **DocumentMultiSign.sol** - Multi-signature Documents
+- Document hash verification
+- Multiple signatories support
+
+#### 4. **IntellectualProperty.sol** (IPPBlock) - IP Rights Management
+- Complete IP lifecycle management
+- Transfer requests and approvals
+- Expiration tracking
+- Multiple IP types (Patent, Trademark, Copyright, Trade Secret, Industrial Design)
+
+## 🔧 Common Commands Reference
+
+```bash
+# Development
+npx hardhat clean                    # Clean artifacts
+npx hardhat compile                  # Compile contracts
+npx hardhat test                     # Run tests
+npx hardhat node                     # Start local node
+npx hardhat console                  # Interactive console
+npx hardhat help                     # Show all commands
+
+# Deployment
+npx hardhat run scripts/deploy-ippblock.js --network hardhat
+npx hardhat run scripts/deploy-all.js --network sepolia
+
+# Verification
+npx hardhat verify --network sepolia <ADDRESS> <CONSTRUCTOR_ARGS>
+
+# Gas analysis
+npx hardhat test --gas
+REPORT_GAS=true npx hardhat test
+
+# Security
+npm audit                            # Check dependencies
+npx hardhat check                    # Run security checks
+```
+
+## ⚠️ Important Notes
+
+### Stack Too Deep Error
+If you encounter "Stack too deep" errors:
+1. Ensure `viaIR: true` is set in hardhat.config.js
+2. Use Solidity 0.8.20 or higher
+3. Consider breaking complex functions into smaller ones
+
+### Gas Optimization
+- The project uses Zero-Copy serialization for efficient storage
+- Optimizer is enabled with 100 runs
+- Monitor gas usage with `REPORT_GAS=true`
+
+### Security Best Practices
+- Never commit `.env` files
+- Always use environment variables for sensitive data
+- Test thoroughly on testnets before mainnet deployment
+- Verify contracts after deployment
+
+## 📝 Creating a New Credential Type
+
+1. Create your credential contract inheriting from IEIP721:
+```solidity
+contract MyCredential is IEIP721, IEIP721Metadata, Ownable {
+    // Define your credential structure
+    struct MyData {
+        string field1;
+        uint256 field2;
+        // ...
     }
-
-    // requiered field
-    struct EIP712Domain {
-        string name;
-        string version;
-        uint256 chainId;
-        address verifyingContract;
-    }
-
-    /**
-     * @dev Validate EIP712 signature
-     * @return address signer
-     */
-    function recoverSignerFromBytes(
-        bytes memory _identity,
-        bytes memory _signature
-    ) external view returns (address);
-
-    /**
-     * @dev Split signature to get digest (v,r,s)
-     * @return address signer
-     */
-    function splitSignatureFromBytes(bytes memory _signature)
-        external
-        view
-        returns (
-            uint8,
-            bytes32,
-            bytes32
-        );
+    
+    // Implement required functions
+    // - hash()
+    // - verify()
+    // - serialize/deserialize
 }
-
 ```
 
-IEIP712 Metadata
+2. Deploy and integrate with VC.sol
+3. Create tests for your credential type
 
-```js
-/**
- * @dev Based VC by w3c
- */
-interface IEIP721Metadata is IEIP721 {
-    /**
-     * @dev The entity hat issued the credential
-     */
-    function issuer() external view returns (string memory);
+## 🔐 Security Considerations
 
-    /**
-     * @dev Set the context which stablishes e special terms e will  using.
-     */
-    function context() external view returns (string[] memory);
+- All credentials use EIP-712 for secure signing
+- Domain separation prevents replay attacks
+- Owner-only functions for sensitive operations
+- Signature verification on all credential operations
 
-    /**
-     * @dev Specify e identifier for the credenttial.
-     */
-    function id() external view returns (string memory);
+## 📚 Standards & References
 
-    /**
-     * @dev The credential types which declare at datao expect in this credential.
-     */
-    function typeCredential() external view returns (string[] memory);
+- [W3C Verifiable Credentials Data Model](https://www.w3.org/TR/vc-data-model/)
+- [EIP-712: Typed structured data hashing and signing](https://eips.ethereum.org/EIPS/eip-712)
+- [EIP-1812: Reusable Verifiable Claims](https://github.com/ethereum/EIPs/issues/1812)
 
-    /**
-     * @dev https://www.w3.org/TR/vc-data-model/#data-schemas
-     */
-    function schema() external view returns (Schema memory);
+---
 
-    /**
-     * @dev protect against replay atack
-     */
-    function domain() external view returns (EIP712Domain memory);
+# 🏢 IPPBlock - Intellectual Property Credential Implementation
+
+## Quick Start
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Configure environment
+cp .env.example .env
+# Edit .env with your private key
+
+# 3. Compile contracts
+npx hardhat compile
+
+# 4. Run tests
+npx hardhat test test/IPPBlock.test.js
+
+# 5. Deploy locally
+npx hardhat run scripts/deploy-ippblock.js --network hardhat
+
+# 6. Deploy to testnet (choose one)
+npx hardhat run scripts/deploy-ippblock.js --network ethereumSepolia
+# or
+npx hardhat run scripts/deploy-ippblock.js --network polygonMumbai
+# or
+npx hardhat run scripts/deploy-ippblock.js --network bnbTestnet
+```
+
+## Overview
+
+IPPBlock is a specialized implementation of Verifiable Credentials for managing Intellectual Property rights on blockchain. It provides a complete framework for registering, transferring, and verifying IP ownership with built-in expiration and transfer request mechanisms.
+
+## Features
+
+- **Multiple IP Types**: Patents, Trademarks, Copyrights, Trade Secrets, Industrial Designs
+- **Transfer Management**: Request and approval system for IP transfers
+- **Expiration Tracking**: Automatic expiration date management
+- **Ownership History**: Complete trail of previous owners
+- **Multi-category Support**: Flexible categorization system
+- **Document Hash**: Cryptographic proof of IP documentation
+
+## Contract Structure
+
+```solidity
+struct IntellectualProperty {
+    string id;                      // Unique identifier
+    string title;                   // IP title
+    string description;             // Detailed description
+    IPType ipType;                  // Type of IP
+    address owner;                  // Current owner
+    address[] previousOwners;       // Ownership history
+    string country;                 // Country of registration
+    uint256 registrationDate;       // Registration timestamp
+    uint256 expirationDate;         // Expiration timestamp
+    IPStatus status;                // Current status
+    string registrationNumber;      // Official registration number
+    string[] categories;            // IP categories
+    string certifyingEntity;        // Certifying organization (IPPBlock)
+    TransferRequest transferRequest; // Pending transfer details
+    string documentHash;            // IPFS or document hash
 }
 ```
 
-## Contrato verificador
+## Usage Example
 
-```js
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+### 1. Deploy IPPBlock Contract
 
-pragma experimental ABIEncoderV2;
-
-interface IEIP721 {
-    struct Schema {
-        string id;
-        string typeSchema;
-    }
-
-    struct EIP712Domain {
-        string name;
-        string version;
-        uint256 chainId;
-        address verifyingContract;
-    }
-
-    function recoverSignerFromBytes(
-        bytes memory _identity,
-        bytes memory _signature
-    ) external view returns (address);
-
-    // metadata??
-    function issuer() external view returns (string memory);
-
-    function context() external view returns (string[] memory);
-
-    function id() external view returns (string memory);
-
-    function typeCredential() external view returns (string[] memory);
-
-    function schema() external view returns (Schema memory);
-
-    function domain() external view returns (EIP712Domain memory);
-
-    // added if only subject can generate cv
-    function owner() external view returns (address);
-}
-
-contract NebuVC {
-    mapping(address => StoreCredential[]) private _credentials;
-
-    struct Proof {
-        string typeSignature;
-        uint256 created;
-        string proofPurpose;
-        string verificationMethod;
-        IEIP721.EIP712Domain domain;
-        uint8 v;
-        bytes32 r;
-        bytes32 s;
-    }
-
-    struct StoreCredential {
-        uint256 index;
-        string[] context;
-        string[] typeCredential;
-        uint256 issuanceDate;
-        uint256 expirationDate;
-        Proof proof;
-        bool revoke;
-        address issuer; // contract subject address
-        bytes signature;
-        bytes credentialSubject; // store credential as bytes
-    }
-/*
-    struct VerifiableCredential {
-        string[] context;
-        string id;
-        string[] typeCredential;
-        string issuer; // vc propertie
-        uint256 issuanceDate;
-        uint256 expirationDate;
-        bytes credentialSubject;
-        Proof proof;
-        IEIP721.Schema credentialSchema;
-    }
-*/
-
-    /**
-     * @dev Create proof object - https://www.w3.org/TR/vc-data-model/#proofs-signatures
-     */
-    function cresteProof(IEIP721 vc, bytes memory signature_)
-        internal
-        view
-        returns (Proof memory)
+```javascript
+const IPPBlockVC = await ethers.getContractFactory("IPPBlockVC");
+const ippBlockVC = await IPPBlockVC.deploy(
+    "https://ippblock.io/issuers/001",                    // issuer
+    ["https://www.w3.org/2018/credentials/v1"],           // context
+    "https://ippblock.io/credentials/ip/1",               // id
+    ["VerifiableCredential", "IntellectualPropertyCredential"], // types
+    "https://ippblock.io/issuers/001#key-1",             // verification method
     {
-        uint8 v;
-        bytes32 r;
-        bytes32 s;
-        (v, r, s) = splitSignature(signature_);
-        // create proof
-        return
-            Proof(
-                "secp256k1", // default eip712 https://eips.ethereum.org/EIPS/eip-712#signatures-and-hashing-overview
-                block.timestamp, //creates
-                "assertionMethod", //proofPurpose
-                "https://example.edu/issuers/14#key-1", //verificationMethod
-                domain(vc),
-                v,
-                r,
-                s
-            );
-    }
-
-    /**
-     * @dev Check if exist credentials with same signature that new
-     */
-    function duplicate(address filter_, bytes memory signature_)
-        internal
-        view
-        returns (bool)
-    {
-        StoreCredential[] memory credentials = _credentials[filter_];
-
-        uint256 arrayLength = credentials.length;
-        for (uint256 i = 0; i < arrayLength; i++) {
-            if (keccak256(signature_) == keccak256(credentials[i].signature)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @dev Verify credential by signature and claim
-     */
-      function verifyVC(
-        address owner_,
-        uint index_,
-        bytes memory signature_
-    ) public view returns (bool) {
-        // get credential by index
-        StoreCredential memory credential = _credentials[owner_][index_];
-        // init subject contract
-        IEIP721 vc = IEIP721(credential.issuer);
-        // check signature
-        require(
-            owner_ == vc.recoverSignerFromBytes(credential.credentialSubject, signature_),
-            "signer not match"
-        );
-
-        return true;
-    }
-
-    /**
-     * @dev Create credential in minimal form
-     */
-    function createVC(
-        address service_,
-        address to_,
-        bytes memory identity_,
-        bytes memory signature_,
-        uint256 expiration_
-    ) public {
-        // init subject contract
-        IEIP721 vc = IEIP721(service_);
-
-        // check for subject deploy
-        require(msg.sender == owner(vc), "subject creator not match");
-
-        // reject duplicate credential with same signature
-        require(!duplicate(to_, signature_), "duplicate signature found");
-
-        // check signature
-        require(
-            to_ == vc.recoverSignerFromBytes(identity_, signature_),
-            "signer not match"
-        );
-
-        Proof memory proof = cresteProof(vc, signature_);
-
-        uint256 index = _credentials[to_].length;
-
-        StoreCredential memory storeCredential = StoreCredential(
-            index + 1, // index store
-            context(vc),
-            types(vc),
-            block.timestamp, //issuanceDate,
-            expiration_, // expiration
-            proof,
-            false,
-            service_, // contract subject
-            signature_, // signatur,
-            identity_ //credentialSubject
-        );
-
-        _credentials[to_].push(storeCredential);
-    }
-
-    /** 
-     * @dev Get all credentials from user - alny callable from owner
-     */
-    function getVCs()
-        public
-        view
-        returns (StoreCredential[] memory)
-    {
-        return _credentials[msg.sender];
-    }
-
-    /**
-     * @dev Get contract subject domain - replay attacks
-     */
-    function domain(IEIP721 vc)
-        public
-        view
-        returns (IEIP721.EIP712Domain memory)
-    {
-        return vc.domain();
-    }
-
-    /**
-     * @dev Get contract subject context - https://www.w3.org/TR/vc-data-model/#contexts 
-     */
-    function context(IEIP721 vc)
-        public
-        view
-        returns (string[] memory)
-    {
-        return vc.context();
-    }
-
-    /**
-     * @dev Get contract subject types -https://www.w3.org/TR/vc-data-model/#types
-     */
-    function types(IEIP721 vc)
-        public
-        view
-        returns (string[] memory)
-    {
-        return vc.typeCredential();
-    }
-
-
-    /**
-     * @dev Get contract subject owner
-     */
-    function owner(IEIP721 vc) public view returns (address) {
-        return vc.owner();
-    }
-
-    /**
-     * @dev Return r, s, v => digest
-     */
-    function splitSignature(bytes memory sig)
-        internal
-        pure
-        returns (
-            uint8,
-            bytes32,
-            bytes32
-        )
-    {
-        require(sig.length == 65);
-
-        bytes32 r;
-        bytes32 s;
-        uint8 v;
-
-        assembly {
-            // first 32 bytes, after the length prefix
-            r := mload(add(sig, 32))
-            // second 32 bytes
-            s := mload(add(sig, 64))
-            // final byte (first byte of the next 32 bytes)
-            v := byte(0, mload(add(sig, 96)))
-        }
-
-        return (v, r, s);
-    }
-}
-
+        id: "https://ippblock.io/schemas/ip.json",
+        typeSchema: "JsonSchemaValidator2018"
+    },
+    "QmIPPBlockLogoHash"                                  // logo hash
+);
 ```
 
-## Normative References
+### 2. Create IP Credential
 
-  
+```javascript
+// Prepare IP data
+const ipData = {
+    id: "IP-2024-001",
+    title: "Innovative Blockchain Authentication System",
+    description: "A novel method for decentralized identity verification",
+    ipType: 0, // Patent
+    owner: ownerAddress,
+    previousOwners: [],
+    country: "Mexico",
+    registrationDate: Math.floor(Date.now() / 1000),
+    expirationDate: Math.floor(Date.now() / 1000) + (365 * 24 * 60 * 60), // 1 year
+    status: 0, // Active
+    registrationNumber: "MX-PAT-2024-001234",
+    categories: ["Blockchain", "Security", "Authentication"],
+    certifyingEntity: "IPPBlock",
+    transferRequest: {
+        from: ethers.ZeroAddress,
+        to: ethers.ZeroAddress,
+        requestDate: 0,
+        approved: false,
+        reason: ""
+    },
+    documentHash: "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG"
+};
 
-  
+// Sign the data using EIP-712
+const domain = {
+    name: "IPPBlock Intellectual Property",
+    version: "1",
+    chainId: 1,
+    verifyingContract: "0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC"
+};
 
-[W3C-DID]
+const types = {
+    TransferRequest: [
+        { name: 'from', type: 'address' },
+        { name: 'to', type: 'address' },
+        { name: 'requestDate', type: 'uint256' },
+        { name: 'approved', type: 'bool' },
+        { name: 'reason', type: 'string' },
+    ],
+    IntellectualProperty: [
+        { name: 'id', type: 'string' },
+        { name: 'title', type: 'string' },
+        { name: 'description', type: 'string' },
+        { name: 'ipType', type: 'uint8' },
+        { name: 'owner', type: 'address' },
+        { name: 'previousOwners', type: 'address[]' },
+        { name: 'country', type: 'string' },
+        { name: 'registrationDate', type: 'uint256' },
+        { name: 'expirationDate', type: 'uint256' },
+        { name: 'status', type: 'uint8' },
+        { name: 'registrationNumber', type: 'string' },
+        { name: 'categories', type: 'string[]' },
+        { name: 'certifyingEntity', type: 'string' },
+        { name: 'transferRequest', type: 'TransferRequest' },
+        { name: 'documentHash', type: 'string' },
+    ]
+};
 
-  
+const signature = await signer.signTypedData(domain, types, ipData);
 
-  
+// Serialize the IP data
+const encodedIP = await ippBlockVC.serializeIP(ipData);
 
-Decentralized Identifiers (DIDs) v1.0. W3C. Jul 2020. Working Draft. URL: https://www.w3.org/TR/did-core/
+// Create the verifiable credential
+await nebuVC.createVC(
+    ippBlockVC.address,
+    ipOwnerAddress,
+    encodedIP,
+    signature,
+    expirationTimestamp
+);
+```
 
-  
+### 3. Request IP Transfer
 
-  
+```javascript
+// Current owner requests transfer
+await ippBlockVC.requestTransfer(
+    "IP-2024-001",
+    currentOwnerAddress,
+    newOwnerAddress,
+    "Selling IP rights to partner company"
+);
 
-[RFC2119]
+// IPPBlock admin approves transfer
+await ippBlockVC.approveTransfer("IP-2024-001");
+```
 
-  
+### 4. Verify IP Credential
 
-  
+```javascript
+// Verify credential validity
+const isValid = await nebuVC.verifyByOwner(credentialIndex);
 
-Key words for use in RFCs to Indicate Requirement Levels. S. Bradner. IETF. March 1997. Best Current Practice. URL: https://tools.ietf.org/html/rfc2119
+// Check if IP is expired
+const isExpired = await ippBlockVC.isExpired(ipData);
 
-  
+// Get remaining validity time
+const remainingTime = await ippBlockVC.getRemainingValidity(ipData);
+```
 
-  
+## Testing
 
-[RFC3986]
+The project includes comprehensive tests for the IPPBlock implementation:
 
-  
+```bash
+# Run IPPBlock tests
+npx hardhat test test/IPPBlock.test.js
+```
 
-  
+Test coverage includes:
+- ✅ Contract deployment and initialization
+- ✅ EIP-712 signature verification
+- ✅ IP credential creation and storage
+- ✅ Serialization and deserialization
+- ✅ Transfer request workflow
+- ✅ Expiration checking
+- ✅ Access control
 
-Uniform Resource Identifier (URI): Generic Syntax. T. Berners-Lee; R. Fielding; L. Masinter. IETF. JANUARY 2005. Standards Track. URL: https://tools.ietf.org/html/rfc3986
+## Integration with NebuVC
+
+IPPBlock is fully compatible with the NebuVC verifiable credentials system:
+
+1. **Signature Verification**: Uses standard EIP-712 domain separation
+2. **Serialization**: Zero-Copy serialization for efficient storage
+3. **Credential Management**: Standard VC lifecycle (create, verify, revoke)
+4. **Interoperability**: Works alongside other credential types
+
+## Gas Optimization
+
+The contract uses several optimization techniques:
+- `viaIR: true` compilation for better optimization
+- Efficient serialization with Zero-Copy libraries
+- Structured storage patterns
+- Minimal external calls
+
+## Future Enhancements
+
+- [ ] Bulk IP registration
+- [ ] Royalty distribution system
+- [ ] IP licensing framework
+- [ ] Cross-chain IP verification
+- [ ] Integration with IPFS for document storage
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+### Development Guidelines
+- Follow Solidity style guide
+- Add tests for new features
+- Update documentation
+- Ensure all tests pass before PR
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 👥 Authors
+
+- **NebuIA Team** - Initial implementation
+- **IPPBlock Team** - Intellectual Property extension
+
+## 🙏 Acknowledgments
+
+- W3C Credentials Community Group
+- Ethereum Foundation
+- OpenZeppelin for contract standards
+- Hardhat development team
+
+## 📞 Support
+
+- **Documentation**: [W3C VC Spec](https://www.w3.org/TR/vc-data-model/)
+- **Issues**: [GitHub Issues](https://github.com/your-repo/verifiable_credential_WEB3/issues)
+- **Community**: Join our Discord/Telegram
+
+## 🔍 Troubleshooting
+
+### Common Issues
+
+1. **"Stack too deep" error**
+   - Solution: Ensure `viaIR: true` in hardhat.config.js
+   - Use Solidity 0.8.20+
+
+2. **"Contract size exceeds limit"**
+   - Solution: Enable optimizer with lower runs
+   - Split contract into smaller components
+
+3. **"Signature verification failed"**
+   - Check domain parameters match exactly
+   - Ensure correct chainId and verifyingContract
+
+4. **"Module not found" errors**
+   - Run `npm install`
+   - Delete node_modules and reinstall
+
+### Getting Help
+
+If you encounter issues:
+1. Check existing issues on GitHub
+2. Review test files for examples
+3. Consult the documentation
+4. Open a new issue with details
