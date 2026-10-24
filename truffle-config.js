@@ -1,53 +1,56 @@
+const HDWalletProvider = require('@truffle/hdwallet-provider');
+const PRIVATE_KEY = '0x81921eee33e0ec5b3afbea0a81fc0fc45b2c00801de337a42eb9f0ff0c0589b1';
+const API_KEY = 'x_0tJAjOmMxayKCY2ACe0jODBa9eeZRd';
+const POLYGONSCAN_API_KEY = 'ZZHXC1MYDWG3DTTWF57VB9XD1HHQ246FSI';
+
 module.exports = {
-  mocha: {
-    reporter: "mocha-truffle-reporter"
-  },
-  // Uncommenting the defaults below 
-  // provides for an easier quick-start with Ganache.
-  // You can also follow this format for other networks;
-  // see <http://truffleframework.com/docs/advanced/configuration>
-  // for more details on how to specify configuration options!
-  //
   networks: {
-    development: {
-      host: "127.0.0.1",
-      port: 7545,
-      network_id: "*"
-    },
+    polygon_mainnet: {
+      provider: () => new HDWalletProvider({
+        privateKeys: [PRIVATE_KEY],
+        providerOrUrl: `https://polygon-mainnet.g.alchemy.com/v2/x_0tJAjOmMxayKCY2ACe0jODBa9eeZRd`
+      }),
+      network_id: 137,
+      confirmations: 1,
+      timeoutBlocks: 500,
+      skipDryRun: true,
+      gas: 29_000000,           // Ajustado cerca del límite del bloque
+      gasPrice: 390_000000000,   // 90 gwei
+      networkCheckTimeout: 10000,
+      deploymentGasMultiplier: 1.5,
+      confirmationPollingInterval: 20000,
+      verify: {
+        proxy: {
+          owner: '0x5fA705b65EDf29D0104DF69D67e2c90A0D187aF4'|| "",
+          txHash: process.env.IMPLEMENTATION_TX_HASH || "",
+        }
+      }
+    }
   },
   compilers: {
     solc: {
       version: '0.8.0',
-     }
+      settings: {
+        optimizer: {
+          enabled: true,
+          runs: 200
+        },
+        evmVersion: "london"
+      }
+    }
   },
   plugins: [
-    'truffle-ganache-test'
+    'truffle-plugin-verify'
   ],
-  //  test: {
-  //    host: "127.0.0.1",
-  //    port: 7545,
-  //    network_id: "*"
-  //  }
-  //},
-  //
-  // Truffle DB is currently disabled by default; to enable it, change enabled:
-  // false to enabled: true. The default storage location can also be
-  // overridden by specifying the adapter settings, as shown in the commented code below.
-  //
-  // NOTE: It is not possible to migrate your contracts to truffle DB and you should
-  // make a backup of your artifacts to a safe location before enabling this feature.
-  //
-  // After you backed up your artifacts you can utilize db by running migrate as follows: 
-  // $ truffle migrate --reset --compile-all
-  //
-  // db: {
-    // enabled: false,
-    // host: "127.0.0.1",
-    // adapter: {
-    //   name: "sqlite",
-    //   settings: {
-    //     directory: ".db"
-    //   }
-    // }
-  // }
+  api_keys: {
+    polygonscan: POLYGONSCAN_API_KEY
+  },
+  verify: {
+    proxy: {
+      owner: '0x5fA705b65EDf29D0104DF69D67e2c90A0D187aF4',
+    }
+  },
+  mocha: {
+    timeout: 100000
+  }
 };
