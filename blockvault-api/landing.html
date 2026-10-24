@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlockVault - Almacenamiento Blockchain con Herencia Digital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #43BCDF;
+            --primary-dark: #2A9CC3;
+            --primary-light: #6CCCE8;
+            --secondary: #1FE784;
+            --secondary-dark: #18B968;
+            --secondary-light: #4EED9C;
+            --dark: #040405;
+            --midnight: #043F51;
+            --jade: #29A869;
+            --white: #FFFFFF;
+            --gray-100: #F7F8FA;
+            --gray-200: #E8EAED;
+            --gray-300: #D0D3D8;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-600: #4B5563;
+            --gray-700: #374151;
+            --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            --gradient-secondary: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-light) 100%);
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+            --shadow-xl: 0 16px 48px rgba(0,0,0,0.16);
+            --shadow-glow: 0 0 40px rgba(67, 188, 223, 0.3);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            color: var(--gray-700);
+            background: var(--white);
+            overflow-x: hidden;
+        }
+
+        /* Ultra-modern Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1rem 2rem;
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        nav.scrolled {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: var(--shadow-md);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo svg {
+            width: 32px;
+            height: 32px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--gray-600);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .metamask-btn {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+        }
+
+        .metamask-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .metamask-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Hero Section with Advanced Animation */
+        .hero {
+            padding: 8rem 2rem 4rem;
+            background: linear-gradient(180deg, var(--gray-100) 0%, var(--white) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.5;
+        }
+
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-text h1 {
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+        }
+
+        .hero-text h1 span {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+        }
+
+        .hero-text p {
+            font-size: 1.25rem;
+            color: var(--gray-600);
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .btn-secondary {
+            background: var(--white);
+            color: var(--primary);
+            padding: 1rem 2rem;
+            border-radius: 16px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 2px solid var(--gray-200);
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-100);
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        /* 3D Interactive Hero Visual */
+        .hero-visual {
+            position: relative;
+            perspective: 1000px;
+        }
+
+        .hero-3d-container {
+            width: 100%;
+            height: 500px;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotateX(5deg) rotateY(-5deg); }
+            50% { transform: translateY(-20px) rotateX(5deg) rotateY(5deg); }
+        }
+
+        .glass-card {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .card-1 {
+            top: 10%;
+            left: 10%;
+            width: 300px;
+            transform: translateZ(60px);
+        }
+
+        .card-2 {
+            top: 40%;
+            right: 10%;
+            width: 280px;
+            transform: translateZ(40px);
+        }
+
+        .card-3 {
+            bottom: 10%;
+            left: 20%;
+            width: 320px;
+            transform: translateZ(80px);
+        }
+
+        /* Contract Integration Section */
+        .contract-section {
+            padding: 4rem 2rem;
+            background: var(--gray-100);
+        }
+
+        .contract-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .contract-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .contract-header h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+
+        .contract-interface {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--gray-200);
+        }
+
+        .contract-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .tab {
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            font-weight: 600;
+            color: var(--gray-500);
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .tab.active {
+            color: var(--primary);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        .code-viewer {
+            background: var(--dark);
+            color: #f8f8f2;
+            padding: 2rem;
+            border-radius: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-line {
+            margin: 0.25rem 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .code-line-number {
+            color: var(--gray-500);
+            margin-right: 2rem;
+            min-width: 3ch;
+            text-align: right;
+        }
+
+        .code-keyword {
+            color: #ff79c6;
+        }
+
+        .code-string {
+            color: #f1fa8c;
+        }
+
+        .code-function {
+            color: #50fa7b;
+        }
+
+        .code-comment {
+            color: #6272a4;
+        }
+
+        .copy-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: var(--gray-700);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background 0.3s ease;
+        }
+
+        .copy-button:hover {
+            background: var(--gray-600);
+        }
+
+        /* Stats Section with Live Data */
+        .stats {
+            padding: 4rem 2rem;
+            background: var(--white);
+        }
+
+        .stats-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--gray-100) 0%, var(--white) 100%);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid var(--gray-200);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--gradient-primary);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-icon svg {
+            width: 24px;
+            height: 24px;
+            stroke: white;
+            fill: none;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .stat-label {
+            color: var(--gray-500);
+            font-weight: 500;
+        }
+
+        .stat-trend {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(28, 231, 131, 0.1);
+            color: var(--secondary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        /* Advanced Features Grid */
+        .features {
+            padding: 6rem 2rem;
+            background: var(--gray-100);
+        }
+
+        .features-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .features-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .features-header h2 {
+            font-size: 3rem;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+
+        .features-header p {
+            font-size: 1.25rem;
+            color: var(--gray-600);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            border: 1px solid var(--gray-200);
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-xl);
+            border-color: transparent;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-primary);
+            border-radius: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .feature-icon svg {
+            width: 40px;
+            height: 40px;
+            stroke: white;
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 1rem;
+        }
+
+        .feature-description {
+            color: var(--gray-600);
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+        .feature-details {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .feature-detail {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--gray-500);
+            font-size: 0.9rem;
+        }
+
+        .feature-detail svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--secondary);
+        }
+
+        /* Interactive Demo Section */
+        .demo-section {
+            padding: 6rem 2rem;
+            background: var(--white);
+        }
+
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .demo-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .demo-interface {
+            background: var(--gray-100);
+            border-radius: 24px;
+            padding: 3rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .wallet-connect {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .wallet-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--white);
+            padding: 1rem 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--gray-400);
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator.connected {
+            background: var(--secondary);
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark);
+            color: var(--gray-400);
+            padding: 4rem 2rem 2rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr repeat(3, 1fr);
+            gap: 4rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-brand h3 {
+            color: var(--white);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links h4 {
+            color: var(--white);
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links a {
+            color: var(--gray-400);
+            text-decoration: none;
+            display: block;
+            padding: 0.5rem 0;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid var(--gray-700);
+            padding-top: 2rem;
+            text-align: center;
+            font-size: 0.875rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-3d-container {
+                height: 300px;
+            }
+
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero-text h1 {
+                font-size: 2.5rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <svg viewBox="0 0 24 24" fill="none">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                BlockVault
+            </div>
+            <div class="nav-links">
+                <a href="#features">Características</a>
+                <a href="#contract">Smart Contract</a>
+                <a href="#demo">Demo</a>
+                <a href="https://blockscout.com/etc/mainnet/address/0xCBb3F2dDd6584584E1FcB1b4546f002bD4B5140D" target="_blank">Explorer</a>
+                <button class="metamask-btn" onclick="connectWallet()">
+                    <svg viewBox="0 0 24 24" fill="none">
+                        <path d="M21.007 8.222A3.738 3.738 0 0 0 15.045 5.2a3.737 3.737 0 0 0 1.156 6.583 2.988 2.988 0 0 1-2.668 1.67h-2.99a4.456 4.456 0 0 0-2.989 1.165V7.4a3.737 3.737 0 1 0-1.494 0v9.117a3.776 3.776 0 1 0 1.816.099 2.99 2.99 0 0 1 2.668-1.667h2.99a4.484 4.484 0 0 0 4.223-3.039 3.736 3.736 0 0 0 3.25-3.687zM4.565 3.738a2.242 2.242 0 1 1 4.484 0 2.242 2.242 0 0 1-4.484 0zm4.484 16.441a2.242 2.242 0 1 1-4.484 0 2.242 2.242 0 0 1 4.484 0zm8.221-9.715a2.242 2.242 0 1 1 0-4.485 2.242 2.242 0 0 1 0 4.485z" fill="currentColor"/>
+                    </svg>
+                    Conectar MetaMask
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <canvas class="hero-canvas" id="heroCanvas"></canvas>
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>El Futuro del <span>Almacenamiento Blockchain</span> con Herencia Digital</h1>
+                <p>BlockVault revoluciona cómo almacenas, proteges y transmites tu legado digital. Con contratos inteligentes en Ethereum Classic y gestión descentralizada.</p>
+                <div class="hero-buttons">
+                    <a href="#demo" class="btn-primary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M13 2L3 14H12L11 22L21 10H12L13 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Comenzar Ahora
+                    </a>
+                    <a href="https://blockscout.com/etc/mainnet/address/0xCBb3F2dDd6584584E1FcB1b4546f002bD4B5140D" target="_blank" class="btn-secondary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Ver Contrato
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-3d-container">
+                    <div class="glass-card card-1">
+                        <h4 style="color: var(--primary); font-weight: 700; margin-bottom: 0.5rem;">Herencia Automática</h4>
+                        <p style="font-size: 0.875rem; color: var(--gray-600);">Designa herederos para tus activos digitales</p>
+                    </div>
+                    <div class="glass-card card-2">
+                        <h4 style="color: var(--secondary); font-weight: 700; margin-bottom: 0.5rem;">10GB Gratis</h4>
+                        <p style="font-size: 0.875rem; color: var(--gray-600);">Almacenamiento perpetuo incluido</p>
+                    </div>
+                    <div class="glass-card card-3">
+                        <h4 style="color: var(--jade); font-weight: 700; margin-bottom: 0.5rem;">AES-256</h4>
+                        <p style="font-size: 0.875rem; color: var(--gray-600);">Encriptación militar con 3x redundancia</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Smart Contract Section -->
+    <section class="contract-section" id="contract">
+        <div class="contract-container">
+            <div class="contract-header">
+                <h2>Interactúa con el Smart Contract</h2>
+                <p>Conecta tu MetaMask y gestiona tus activos directamente desde la blockchain</p>
+            </div>
+            <div class="contract-interface">
+                <div class="contract-tabs">
+                    <button class="tab active" onclick="showTab('read')">Leer Datos</button>
+                    <button class="tab" onclick="showTab('write')">Escribir Datos</button>
+                    <button class="tab" onclick="showTab('events')">Eventos</button>
+                </div>
+                <div id="read-tab" class="tab-content">
+                    <div class="code-viewer">
+                        <button class="copy-button" onclick="copyCode()">Copiar</button>
+                        <div class="code-line">
+                            <span class="code-line-number">1</span>
+                            <span class="code-comment">// Obtener información del usuario</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-line-number">2</span>
+                            <span class="code-keyword">const</span> userInfo = <span class="code-keyword">await</span> contract.<span class="code-function">getUserInfo</span>(address);
+                        </div>
+                        <div class="code-line">
+                            <span class="code-line-number">3</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-line-number">4</span>
+                            <span class="code-comment">// Verificar acceso a contenido</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-line-number">5</span>
+                            <span class="code-keyword">const</span> hasAccess = <span class="code-keyword">await</span> contract.<span class="code-function">hasValidAccess</span>(user, contentHash);
+                        </div>
+                        <div class="code-line">
+                            <span class="code-line-number">6</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-line-number">7</span>
+                            <span class="code-comment">// Obtener estadísticas de almacenamiento</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-line-number">8</span>
+                            <span class="code-keyword">const</span> stats = <span class="code-keyword">await</span> contract.<span class="code-function">getTotalStorageStats</span>();
+                        </div>
+                    </div>
+                </div>
+                <div id="write-tab" class="tab-content" style="display: none;">
+                    <div class="code-viewer">
+                        <button class="copy-button" onclick="copyCode()">Copiar</button>
+                        <div class="code-line">
+                            <span class="code-line-number">1</span>
+                            <span class="code-comment">// Subir contenido con herencia digital</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-line-number">2</span>
+                            <span class="code-keyword">const</span> tx = <span class="code-keyword">await</span> contract.<span class="code-function">uploadContent</span>(
+                        </div>
+                        <div class="code-line">
+                            <span class="code-line-number">3</span>
+                            <span>  userAddress,</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-line-number">4</span>
+                            <span>  fileHash,</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-line-number">5</span>
+                            <span>  size,</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-line-number">6</span>
+                            <span>  accessTypes,</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-line-number">7</span>
+                            <span>  prices,</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-line-number">8</span>
+                            <span>  metadata</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-line-number">9</span>
+                            <span>);</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="events-tab" class="tab-content" style="display: none;">
+                    <div class="code-viewer">
+                        <button class="copy-button" onclick="copyCode()">Copiar</button>
+                        <div class="code-line">
+                            <span class="code-line-number">1</span>
+                            <span class="code-comment">// Escuchar eventos del contrato</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-line-number">2</span>
+                            <span>contract.<span class="code-function">on</span>(<span class="code-string">"ContentUploaded"</span>, (owner, hash, size) => {</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-line-number">3</span>
+                            <span>  console.<span class="code-function">log</span>(<span class="code-string">`Nuevo contenido: ${hash}`</span>);</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-line-number">4</span>
+                            <span>});</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-line-number">5</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-line-number">6</span>
+                            <span>contract.<span class="code-function">on</span>(<span class="code-string">"HeirDesignated"</span>, (hash, heir) => {</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-line-number">7</span>
+                            <span>  console.<span class="code-function">log</span>(<span class="code-string">`Heredero designado: ${heir}`</span>);</span>
+                        </div>
+                        <div class="code-line">
+                            <span class="code-line-number">8</span>
+                            <span>});</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Stats -->
+    <section class="stats">
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                        <line x1="9" y1="9" x2="15" y2="9"/>
+                        <line x1="9" y1="15" x2="15" y2="15"/>
+                    </svg>
+                </div>
+                <div class="stat-value" id="storage-stat">521.3 TB</div>
+                <div class="stat-label">Almacenamiento Total</div>
+                <div class="stat-trend">+12.5%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                </div>
+                <div class="stat-value" id="users-stat">12,847</div>
+                <div class="stat-label">Usuarios Activos</div>
+                <div class="stat-trend">+8.3%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                    </svg>
+                </div>
+                <div class="stat-value" id="uptime-stat">99.99%</div>
+                <div class="stat-label">Disponibilidad</div>
+                <div class="stat-trend">Estable</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                    </svg>
+                </div>
+                <div class="stat-value" id="volume-stat">$2.4M</div>
+                <div class="stat-label">Volumen Mensual</div>
+                <div class="stat-trend">+24.7%</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="features-container">
+            <div class="features-header">
+                <h2>Características Revolucionarias</h2>
+                <p>Tecnología blockchain aplicada a tus necesidades reales</p>
+            </div>
+            <div class="features-grid">
+                <!-- Herencia Digital -->
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Herencia Digital Automática</h3>
+                    <p class="feature-description">
+                        Designa herederos para tus archivos y activos digitales. El smart contract garantiza la transferencia automática según tus condiciones.
+                    </p>
+                    <div class="feature-details">
+                        <div class="feature-detail">
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span>Designación de múltiples herederos</span>
+                        </div>
+                        <div class="feature-detail">
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span>Condiciones personalizables</span>
+                        </div>
+                        <div class="feature-detail">
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span>Transferencia automática y segura</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Monetización -->
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-light) 100%);">
+                        <svg viewBox="0 0 24 24">
+                            <line x1="12" y1="1" x2="12" y2="23"/>
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Monetización Opcional</h3>
+                    <p class="feature-description">
+                        Convierte tus archivos en activos generadores de ingresos. Establece precios y modelos de acceso flexibles.
+                    </p>
+                    <div class="feature-details">
+                        <div class="feature-detail">
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span>80% de comisión para creadores</span>
+                        </div>
+                        <div class="feature-detail">
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span>Modelos de suscripción y licencia</span>
+                        </div>
+                        <div class="feature-detail">
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span>Pagos instantáneos en cripto</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Credenciales Verificables -->
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, var(--midnight) 0%, var(--primary) 100%);">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <polyline points="9 12 12 15 16 10"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Credenciales Verificables</h3>
+                    <p class="feature-description">
+                        Sistema de identidad auto-soberana sin contraseñas. Accede a tus archivos con credenciales criptográficas verificables.
+                    </p>
+                    <div class="feature-details">
+                        <div class="feature-detail">
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span>Sin contraseñas vulnerables</span>
+                        </div>
+                        <div class="feature-detail">
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span>Identidad descentralizada</span>
+                        </div>
+                        <div class="feature-detail">
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                            <span>Compatible con estándares W3C</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Interactive Demo -->
+    <section class="demo-section" id="demo">
+        <div class="demo-container">
+            <div class="demo-header">
+                <h2>Prueba BlockVault Ahora</h2>
+                <p>Conecta tu wallet y experimenta el futuro del almacenamiento</p>
+            </div>
+            <div class="demo-interface">
+                <div class="wallet-connect">
+                    <div class="wallet-status">
+                        <div class="status-indicator" id="statusIndicator"></div>
+                        <span id="walletStatus">Wallet no conectada</span>
+                    </div>
+                    <button class="btn-primary" onclick="connectWallet()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M21.007 8.222A3.738 3.738 0 0 0 15.045 5.2a3.737 3.737 0 0 0 1.156 6.583 2.988 2.988 0 0 1-2.668 1.67h-2.99a4.456 4.456 0 0 0-2.989 1.165V7.4a3.737 3.737 0 1 0-1.494 0v9.117a3.776 3.776 0 1 0 1.816.099 2.99 2.99 0 0 1 2.668-1.667h2.99a4.484 4.484 0 0 0 4.223-3.039 3.736 3.736 0 0 0 3.25-3.687zM4.565 3.738a2.242 2.242 0 1 1 4.484 0 2.242 2.242 0 0 1-4.484 0zm4.484 16.441a2.242 2.242 0 1 1-4.484 0 2.242 2.242 0 0 1 4.484 0zm8.221-9.715a2.242 2.242 0 1 1 0-4.485 2.242 2.242 0 0 1 0 4.485z" fill="currentColor"/>
+                        </svg>
+                        Conectar con MetaMask
+                    </button>
+                    <p style="margin-top: 2rem; color: var(--gray-500);">
+                        Contrato: <a href="https://blockscout.com/etc/mainnet/address/0xCBb3F2dDd6584584E1FcB1b4546f002bD4B5140D" target="_blank" style="color: var(--primary); text-decoration: none;">
+                            0xCBb3F2dDd6584584E1FcB1b4546f002bD4B5140D
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-container">
+            <div class="footer-brand">
+                <h3>BlockVault</h3>
+                <p>Revolucionando el almacenamiento digital con blockchain y herencia automática.</p>
+                <div style="margin-top: 2rem;">
+                    <a href="https://blockscout.com/etc/mainnet/address/0xCBb3F2dDd6584584E1FcB1b4546f002bD4B5140D" target="_blank" style="color: var(--primary); text-decoration: none;">
+                        Ver en Block Explorer →
+                    </a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h4>Producto</h4>
+                <ul>
+                    <li><a href="#features">Características</a></li>
+                    <li><a href="#contract">Smart Contract</a></li>
+                    <li><a href="#demo">Demo</a></li>
+                    <li><a href="#">API Docs</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Recursos</h4>
+                <ul>
+                    <li><a href="#">Documentación</a></li>
+                    <li><a href="#">GitHub</a></li>
+                    <li><a href="#">Whitepaper</a></li>
+                    <li><a href="#">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h4>Comunidad</h4>
+                <ul>
+                    <li><a href="#">Discord</a></li>
+                    <li><a href="#">Twitter</a></li>
+                    <li><a href="#">Telegram</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 BlockVault. Todos los derechos reservados. | Construido sobre Ethereum Classic</p>
+        </div>
+    </footer>
+
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Hero canvas animation
+        const canvas = document.getElementById('heroCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Particle system
+        const particles = [];
+        const particleCount = 50;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = Math.random() * 2 - 1;
+                this.speedY = Math.random() * 2 - 1;
+                this.opacity = Math.random() * 0.5 + 0.2;
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+
+            draw() {
+                ctx.fillStyle = `rgba(67, 188, 223, ${this.opacity})`;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+
+            // Connect nearby particles
+            particles.forEach((a, index) => {
+                particles.slice(index + 1).forEach(b => {
+                    const distance = Math.sqrt((a.x - b.x) ** 2 + (a.y - b.y) ** 2);
+                    if (distance < 100) {
+                        ctx.strokeStyle = `rgba(67, 188, 223, ${0.1 * (1 - distance / 100)})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(a.x, a.y);
+                        ctx.lineTo(b.x, b.y);
+                        ctx.stroke();
+                    }
+                });
+            });
+
+            requestAnimationFrame(animateParticles);
+        }
+
+        animateParticles();
+
+        // Tab switching
+        function showTab(tabName) {
+            const tabs = document.querySelectorAll('.tab');
+            const contents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.style.display = 'none');
+            
+            event.target.classList.add('active');
+            document.getElementById(`${tabName}-tab`).style.display = 'block';
+        }
+
+        // Copy code function
+        function copyCode() {
+            const codeViewer = event.target.parentElement;
+            const code = codeViewer.innerText.replace('Copiar', '').trim();
+            navigator.clipboard.writeText(code);
+            event.target.textContent = '¡Copiado!';
+            setTimeout(() => {
+                event.target.textContent = 'Copiar';
+            }, 2000);
+        }
+
+        // MetaMask connection
+        async function connectWallet() {
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    const account = accounts[0];
+                    
+                    document.getElementById('walletStatus').textContent = `Conectado: ${account.slice(0, 6)}...${account.slice(-4)}`;
+                    document.getElementById('statusIndicator').classList.add('connected');
+                    
+                    // Switch to Ethereum Classic if needed
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: '0x3d' }], // 61 in hex for ETC mainnet
+                        });
+                    } catch (switchError) {
+                        if (switchError.code === 4902) {
+                            await window.ethereum.request({
+                                method: 'wallet_addEthereumChain',
+                                params: [{
+                                    chainId: '0x3d',
+                                    chainName: 'Ethereum Classic',
+                                    nativeCurrency: {
+                                        name: 'Ethereum Classic',
+                                        symbol: 'ETC',
+                                        decimals: 18
+                                    },
+                                    rpcUrls: ['https://etc.rivet.link'],
+                                    blockExplorerUrls: ['https://blockscout.com/etc/mainnet']
+                                }],
+                            });
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error connecting wallet:', error);
+                    alert('Error al conectar la wallet. Por favor, intenta de nuevo.');
+                }
+            } else {
+                alert('Por favor, instala MetaMask para continuar.');
+                window.open('https://metamask.io/download/', '_blank');
+            }
+        }
+
+        // Animate stats
+        function animateValue(id, start, end, duration, suffix = '') {
+            const obj = document.getElementById(id);
+            const range = end - start;
+            const minTimer = 50;
+            let stepTime = Math.abs(Math.floor(duration / range));
+            stepTime = Math.max(stepTime, minTimer);
+            const startTime = new Date().getTime();
+            const endTime = startTime + duration;
+            
+            function run() {
+                const now = new Date().getTime();
+                const remaining = Math.max((endTime - now) / duration, 0);
+                const value = Math.round(end - (remaining * range));
+                obj.textContent = value.toLocaleString() + suffix;
+                if (value < end) {
+                    setTimeout(run, stepTime);
+                }
+            }
+            
+            run();
+        }
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                    
+                    // Animate stats when visible
+                    if (entry.target.classList.contains('stats-container')) {
+                        animateValue('storage-stat', 0, 521.3, 2000, ' TB');
+                        animateValue('users-stat', 0, 12847, 2000);
+                        animateValue('volume-stat', 0, 2.4, 2000, 'M');
+                    }
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements
+        document.querySelectorAll('.feature-card, .stat-card, .stats-container').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.6s ease';
+            observer.observe(el);
+        });
+
+        // Smooth scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

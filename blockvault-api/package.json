@@ -1,0 +1,20 @@
+{
+  "name": "blockvault-api",
+  "version": "1.0.0",
+  "description": "BlockVault API - Complete Node.js API for interacting with BlockVault smart contract on Ethereum Classic",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "cd .. && npx hardhat run scripts/deploy-blockvault-etc.js --network ethereumClassic",
+    "example:basic": "node examples/basic-usage.js",
+    "example:vc": "node examples/verifiable-credentials.js",
+    "example:advanced": "node examples/advanced-features.js",
+    "examples": "npm run example:basic && npm run example:vc && npm run example:advanced"
+  },
+  "keywords": ["blockchain", "ethereum-classic", "blockvault", "verifiable-credentials", "web3", "storage"],
+  "author": "BlockVault Team",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^17.2.1",
+    "ethers": "^6.15.0"
+  }
+}

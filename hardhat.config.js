@@ -9,7 +9,7 @@ module.exports = {
     settings: {
       optimizer: {
         enabled: true,
-        runs: 100,
+        runs: 200,
       },
       viaIR: true,
     },
@@ -21,12 +21,8 @@ module.exports = {
       gas: "auto",
       gasPrice: "auto",
       gasMultiplier: 1,
-      accounts: process.env.PRIVATE_KEY ? [
-        {
-          privateKey: process.env.PRIVATE_KEY,
-          balance: "10000000000000000000000" // 10,000 ETH
-        }
-      ] : []
+      // Remove accounts config to use Hardhat's default test accounts
+      // This provides 20 accounts with 10000 ETH each for testing
     },
     
     // Ethereum Mainnet
@@ -114,9 +110,19 @@ module.exports = {
       bsc: process.env.BSCSCAN_API_KEY || "",
       bscTestnet: process.env.BSCSCAN_API_KEY || "",
       
-      // Ethereum Classic (if supported by etherscan plugin)
-      etc: process.env.ETCSCAN_API_KEY || "",
-      etcMordor: process.env.ETCSCAN_API_KEY || ""
-    }
+      // Ethereum Classic (Blockscout API)
+      "ethereum-classic": "8e71eebf-9f0c-40ef-8f47-1858fdc5d5a8",
+      etcMordor: "8e71eebf-9f0c-40ef-8f47-1858fdc5d5a8"
+    },
+    customChains: [
+      {
+        network: "ethereum-classic",
+        chainId: 61,
+        urls: {
+          apiURL: "https://etc.blockscout.com/api",
+          browserURL: "https://etc.blockscout.com"
+        }
+      }
+    ]
   }
 };

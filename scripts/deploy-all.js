@@ -1,126 +1,136 @@
 const hre = require("hardhat");
+const fs = require("fs");
+const path = require("path");
 
 async function main() {
-  console.log("🚀 Starting full deployment...");
+  console.log("🚀 Deploying ALL Contracts to", hre.network.name.toUpperCase(), "...\n");
 
-  // Get the deployer account
   const [deployer] = await hre.ethers.getSigners();
-  console.log("Deploying contracts with the account:", deployer.address);
-  console.log("Account balance:", (await deployer.provider.getBalance(deployer.address)).toString());
+  console.log("📍 Network:", hre.network.name);
+  console.log("📍 Chain ID:", hre.network.config.chainId);
+  console.log("📍 Deployer:", deployer.address);
+  console.log("💰 Balance:", hre.ethers.formatEther(await hre.ethers.provider.getBalance(deployer.address)), "ETH\n");
 
-  // Deploy NebuVC first
-  console.log("\n📄 Deploying NebuVC...");
-  const NebuVC = await hre.ethers.getContractFactory("NebuVC");
-  const nebuVC = await NebuVC.deploy();
-  await nebuVC.waitForDeployment();
-  console.log("NebuVC deployed to:", await nebuVC.getAddress());
+  const deployments = {};
 
-  // Deploy NebuIAVC
-  console.log("\n📄 Deploying NebuIAVC...");
-  const NebuIAVC = await hre.ethers.getContractFactory("NebuIAVC");
-  const nebuIAVC = await NebuIAVC.deploy(
-    "https://nebuia.com/issuer",
-    ["https://www.w3.org/2018/credentials/v1", "https://nebuia.com/credentials/v1"],
-    "https://nebuia.com/credentials/identity/1",
-    ["VerifiableCredential", "IdentityCredential"],
-    "https://nebuia.com/issuer#key-1",
-    {
-      id: "https://nebuia.com/schemas/identity.json",
-      typeSchema: "JsonSchemaValidator2018"
-    },
-    "QmNebuIALogoHash"
-  );
-  await nebuIAVC.waitForDeployment();
-  console.log("NebuIAVC deployed to:", await nebuIAVC.getAddress());
+  try {
+    // 1. VC System
+    console.log("=== 📜 VC SYSTEM ===");
+    console.log("1️⃣ Deploying VC Verifier...");
+    const VC = await hre.ethers.getContractFactory("NebuVC");
+    const vc = await VC.deploy();
+    await vc.waitForDeployment();
+    deployments.VCVerifier = await vc.getAddress();
+    console.log("✅ VC Verifier:", deployments.VCVerifier);
 
-  // Deploy AlumniOfVC
-  console.log("\n📄 Deploying AlumniOfVC...");
-  const AlumniOfVC = await hre.ethers.getContractFactory("AlumniOfVC");
-  const alumniOfVC = await AlumniOfVC.deploy(
-    "https://university.edu/issuer",
-    ["https://www.w3.org/2018/credentials/v1", "https://university.edu/credentials/v1"],
-    "https://university.edu/credentials/alumni/1",
-    ["VerifiableCredential", "AlumniCredential"],
-    "https://university.edu/issuer#key-1",
-    {
-      id: "https://university.edu/schemas/alumni.json",
-      typeSchema: "JsonSchemaValidator2018"
+    console.log("2️⃣ Deploying Store...");
+    const Store = await hre.ethers.getContractFactory("Store");
+    const store = await Store.deploy();
+    await store.waitForDeployment();
+    deployments.Store = await store.getAddress();
+    console.log("✅ Store:", deployments.Store);
+
+    // 2. BlockVault
+    console.log("\n=== 🏦 BLOCKVAULT ===");
+    console.log("3️⃣ Deploying BlockVault...");
+    const BlockVault = await hre.ethers.getContractFactory("BlockVault");
+    const vault = await BlockVault.deploy(deployer.address);
+    await vault.waitForDeployment();
+    deployments.BlockVault = await vault.getAddress();
+    console.log("✅ BlockVault:", deployments.BlockVault);
+
+    // Configure BlockVault
+    await vault.setPlatformFee(250); // 2.5%
+    await vault.setStoragePrice(1, hre.ethers.parseEther("0.001"));
+    await vault.setStoragePrice(10, hre.ethers.parseEther("0.008"));
+    await vault.setStoragePrice(100, hre.ethers.parseEther("0.05"));
+    console.log("✅ BlockVault configured");
+
+    // 3. Origin Certification
+    console.log("\n=== 🌍 ORIGIN CERTIFICATION ===");
+    console.log("4️⃣ Deploying TradeAgreementRegistry...");
+    const TradeRegistry = await hre.ethers.getContractFactory("TradeAgreementRegistry");
+    const tradeRegistry = await TradeRegistry.deploy();
+    await tradeRegistry.waitForDeployment();
+    deployments.TradeAgreementRegistry = await tradeRegistry.getAddress();
+    console.log("✅ TradeAgreementRegistry:", deployments.TradeAgreementRegistry);
+
+    console.log("5️⃣ Deploying UniversalOriginCertificate...");
+    const UniversalOrigin = await hre.ethers.getContractFactory("UniversalOriginCertificate");
+    const universalOrigin = await UniversalOrigin.deploy(deployments.TradeAgreementRegistry);
+    await universalOrigin.waitForDeployment();
+    deployments.UniversalOriginCertificate = await universalOrigin.getAddress();
+    console.log("✅ UniversalOriginCertificate:", deployments.UniversalOriginCertificate);
+
+    console.log("6️⃣ Deploying OriginCertificateFinal...");
+    const OriginFinal = await hre.ethers.getContractFactory("OriginCertificateFinal");
+    const originFinal = await OriginFinal.deploy();
+    await originFinal.waitForDeployment();
+    deployments.OriginCertificateFinal = await originFinal.getAddress();
+    console.log("✅ OriginCertificateFinal:", deployments.OriginCertificateFinal);
+
+    console.log("7️⃣ Deploying MinimalOriginCertificate...");
+    const MinimalOrigin = await hre.ethers.getContractFactory("MinimalOriginCertificate");
+    const minimalOrigin = await MinimalOrigin.deploy();
+    await minimalOrigin.waitForDeployment();
+    deployments.MinimalOriginCertificate = await minimalOrigin.getAddress();
+    console.log("✅ MinimalOriginCertificate:", deployments.MinimalOriginCertificate);
+
+    // Save deployment info
+    const deploymentsPath = path.join(__dirname, "../deployments");
+    if (!fs.existsSync(deploymentsPath)) {
+      fs.mkdirSync(deploymentsPath);
     }
-  );
-  await alumniOfVC.waitForDeployment();
-  console.log("AlumniOfVC deployed to:", await alumniOfVC.getAddress());
 
-  // Deploy DocumentMultiSign
-  console.log("\n📄 Deploying DocumentMultiSign...");
-  const DocumentMultiSign = await hre.ethers.getContractFactory("DocumentMultiSign");
-  const documentMultiSign = await DocumentMultiSign.deploy(
-    "https://documents.org/issuer",
-    ["https://www.w3.org/2018/credentials/v1", "https://documents.org/credentials/v1"],
-    "https://documents.org/credentials/document/1",
-    ["VerifiableCredential", "DocumentCredential"],
-    "https://documents.org/issuer#key-1",
-    {
-      id: "https://documents.org/schemas/document.json",
-      typeSchema: "JsonSchemaValidator2018"
-    }
-  );
-  await documentMultiSign.waitForDeployment();
-  console.log("DocumentMultiSign deployed to:", await documentMultiSign.getAddress());
+    const deploymentFile = path.join(deploymentsPath, `all-contracts-${hre.network.name}.json`);
+    fs.writeFileSync(
+      deploymentFile,
+      JSON.stringify({
+        network: hre.network.name,
+        chainId: hre.network.config.chainId,
+        deployer: deployer.address,
+        timestamp: new Date().toISOString(),
+        contracts: deployments,
+        gasUsed: "Check transaction receipts for gas usage",
+        systems: {
+          vcSystem: {
+            verifier: deployments.VCVerifier,
+            store: deployments.Store
+          },
+          blockVault: {
+            vault: deployments.BlockVault,
+            platformFee: "2.5%"
+          },
+          originCertification: {
+            tradeRegistry: deployments.TradeAgreementRegistry,
+            universal: deployments.UniversalOriginCertificate,
+            optimized: deployments.OriginCertificateFinal,
+            minimal: deployments.MinimalOriginCertificate
+          }
+        }
+      }, null, 2)
+    );
 
-  // Deploy IPPBlockVC
-  console.log("\n📄 Deploying IPPBlockVC...");
-  const IPPBlockVC = await hre.ethers.getContractFactory("IPPBlockVC");
-  const ippBlockVC = await IPPBlockVC.deploy(
-    "https://ippblock.io/issuers/001",
-    ["https://www.w3.org/2018/credentials/v1", "https://ippblock.io/credentials/v1"],
-    "https://ippblock.io/credentials/ip/1",
-    ["VerifiableCredential", "IntellectualPropertyCredential"],
-    "https://ippblock.io/issuers/001#key-1",
-    {
-      id: "https://ippblock.io/schemas/intellectual-property.json",
-      typeSchema: "JsonSchemaValidator2018"
-    },
-    "QmIPPBlockLogoHash123456789"
-  );
-  await ippBlockVC.waitForDeployment();
-  console.log("IPPBlockVC deployed to:", await ippBlockVC.getAddress());
+    console.log("\n✅ ALL DEPLOYMENTS COMPLETE!");
+    console.log(`📄 Deployment saved to: ${deploymentFile}`);
+    console.log("\n📊 DEPLOYMENT SUMMARY:");
+    console.log("=".repeat(50));
+    console.log("VC System:");
+    console.log("  - Verifier:", deployments.VCVerifier);
+    console.log("  - Store:", deployments.Store);
+    console.log("\nBlockVault:");
+    console.log("  - Vault:", deployments.BlockVault);
+    console.log("\nOrigin Certification:");
+    console.log("  - Trade Registry:", deployments.TradeAgreementRegistry);
+    console.log("  - Universal:", deployments.UniversalOriginCertificate);
+    console.log("  - Optimized:", deployments.OriginCertificateFinal);
+    console.log("  - Minimal:", deployments.MinimalOriginCertificate);
+    console.log("=".repeat(50));
 
-  // Deployment summary
-  console.log("\n✅ Deployment Summary:");
-  console.log("======================");
-  console.log("NebuVC:", await nebuVC.getAddress());
-  console.log("NebuIAVC:", await nebuIAVC.getAddress());
-  console.log("AlumniOfVC:", await alumniOfVC.getAddress());
-  console.log("DocumentMultiSign:", await documentMultiSign.getAddress());
-  console.log("IPPBlockVC:", await ippBlockVC.getAddress());
-  console.log("Deployer:", deployer.address);
-  console.log("Network:", hre.network.name);
-  console.log("Chain ID:", (await deployer.provider.getNetwork()).chainId);
-
-  // Save deployment addresses
-  const fs = require("fs");
-  const deploymentData = {
-    network: hre.network.name,
-    chainId: (await deployer.provider.getNetwork()).chainId.toString(),
-    deployer: deployer.address,
-    timestamp: new Date().toISOString(),
-    contracts: {
-      NebuVC: await nebuVC.getAddress(),
-      NebuIAVC: await nebuIAVC.getAddress(),
-      AlumniOfVC: await alumniOfVC.getAddress(),
-      DocumentMultiSign: await documentMultiSign.getAddress(),
-      IPPBlockVC: await ippBlockVC.getAddress()
-    }
-  };
-
-  const deploymentPath = `./deployments/${hre.network.name}-full-deployment.json`;
-  if (!fs.existsSync("./deployments")) {
-    fs.mkdirSync("./deployments");
+  } catch (error) {
+    console.error("\n❌ Deployment failed:", error);
+    throw error;
   }
-  fs.writeFileSync(deploymentPath, JSON.stringify(deploymentData, null, 2));
-  console.log(`\n📁 Deployment data saved to: ${deploymentPath}`);
-
-  console.log("\n✨ All contracts deployed successfully!");
 }
 
 main()
